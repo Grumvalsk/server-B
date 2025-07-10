@@ -1,11 +1,9 @@
-package com.example.serverB.controller;
+package com.example.serverB.cryptoAsimmetrica;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/crittografia")
-public class CrittografiaControllerB {
-
-
+@RequestMapping(path="")
+public class AsimmetricaControllerB {
 }
