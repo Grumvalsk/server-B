@@ -48,7 +48,7 @@ public class AsimmetricServiceB {
             HttpEntity<String> httpEntity = new HttpEntity<>(chiavePubblicaServer, headers);
 
             ResponseEntity<String> response = restTemplate.postForEntity(ulrHandShake, httpEntity, String.class);
-            chiavePubblicaA = response.getBody();
+            chiavePubblicaA = response.getBody().replaceAll("\\r?\\n", "").trim();
             Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
             if (!Files.exists(directory)) {
                 Files.createDirectories(directory);
