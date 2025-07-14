@@ -2,6 +2,7 @@ package com.example.serverB.cryptoAsimmetrica.service;
 
 import com.example.serverB.cryptoAsimmetrica.dto.AsimmetricResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -33,8 +34,11 @@ public class AsimmetricServiceB {
     @Autowired
     private RestTemplate restTemplate;
 
-    private final String ulrHandShake="http://localhost:8080/api/v1/crypto/asimmetrica/hand-shake";
-    private final  String urlComunicate="http://localhost:8080/api/v1/crypto/asimmetrica/ricevimento";
+    @Value("${url.asimmetric.handshake}")
+    private  String ulrHandShake;
+
+    @Value("${url.asimmetric.handshake}")
+    private   String urlComunicate;
 
     public String comunicate(String message) throws IOException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException,

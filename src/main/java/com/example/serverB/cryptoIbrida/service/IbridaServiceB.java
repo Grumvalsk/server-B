@@ -2,6 +2,7 @@ package com.example.serverB.cryptoIbrida.service;
 
 import com.example.serverB.cryptoIbrida.dto.IbridResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -26,14 +27,17 @@ import java.util.Base64;
 @Service
 public class IbridaServiceB {
 
-    private final String urlHandShake="http://localhost:8080/api/v1/crypto/ibrida/hand-shake";
-    private final  String urlRivevimento="http://localhost:8080/api/v1/crypto/ibrida/ricevimento";
+    @Value("${url.ibrid.handshake}")
+    private  String urlHandShake;
+
+    @Value("${url.ibrid.ricevimento}")
+    private   String urlRivevimento;
 
     @Autowired
     private RestTemplate restTemplate;
 
     public String comunicate(String message) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        String chiavePubA= leggiFileDaCartellaEsterna("chiave_pubblicaA.txt");
+        String chiavePubA= leggiFileDaCartellaEsterna("chiave_pubblicaA.txt").replaceAll("\\r?\\n", "").trim();
         if(chiavePubA==null){
             String chiavePubB=leggiFileDaResources("chiave_pubblicaB.txt");
             HttpHeaders headers = new HttpHeaders();
