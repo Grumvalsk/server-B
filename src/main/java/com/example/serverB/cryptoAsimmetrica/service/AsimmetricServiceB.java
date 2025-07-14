@@ -24,6 +24,7 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Service
@@ -103,16 +104,45 @@ public class AsimmetricServiceB {
         return response.getBody();
     }
 
+    public String ricevimento(AsimmetricResponse response) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        String keyPrivata=leggiFileDaResources("chiave_privataB.txt");
+        byte[]chiavePrivataB=Base64.getDecoder().decode(keyPrivata);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(chiavePrivataB);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey pKey = keyFactory.generatePrivate(keySpec);
+        Cipher chiper=Cipher.getInstance("RSA");
+        chiper.init(Cipher.DECRYPT_MODE,pKey);
+        byte[] messaggioDecodificato = Base64.getDecoder().decode(response.getMessaggio());
+        byte[] result = chiper.doFinal(messaggioDecodificato);
+        String messaggioRicevuto=new String(result);
+        System.out.println(messaggioRicevuto);
+       // verifica firma
+        String keyPubblicaA=leggiFileDaCartellaEsterna("chiave_pubblicaA.txt").replaceAll("\\r?\\n", "").trim();
+        byte[]chiavePubB=Base64.getDecoder().decode(keyPubblicaA);
+        X509EncodedKeySpec keySpecFirm = new X509EncodedKeySpec(chiavePubB);
+        KeyFactory keyFactoryFirm = KeyFactory.getInstance("RSA");
+        PublicKey publicKeyB = keyFactoryFirm.generatePublic(keySpecFirm);
+        Cipher cipher = Cipher.getInstance("RSA");
+        byte[] firma = Base64.getDecoder().decode(response.getFirma());
+        cipher.init(Cipher.DECRYPT_MODE, publicKeyB);
+        byte[] digestDaFirma = cipher.doFinal(firma); // questo è un array di byte!
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digestCalcolato = md.digest(messaggioRicevuto.getBytes(StandardCharsets.UTF_8));
+
+        if (!Arrays.equals(digestDaFirma, digestCalcolato)) {
+
+            return "firma non autentica";
+        }
 
 
-    public String decript(String message) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        String chiavePrivata= leggiFileDaResources("chiave_privata.txt");
-        PrivateKey privateKey= getPrivateKey();
-        return null;
+
+        return "Messaggio ricevuto";
     }
 
+
+
     public String scambio(String chiave) throws IOException {
-        Path directory = Paths.get("target/resources");
+        Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
         if (!Files.exists(directory)) {
             Files.createDirectories(directory); // crea la cartella se non esiste
         }
@@ -121,7 +151,7 @@ public class AsimmetricServiceB {
         Files.write(pathFile, chiave.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 
         System.out.println("File scritto in: " + pathFile.toAbsolutePath());
-        return Base64.getEncoder().encodeToString(leggiFileDaResources("chiave_pubblicaB.txt").getBytes());
+        return leggiFileDaResources("chiave_pubblicaB.txt");
 
     }
     private PublicKey getPublicKeyServerA() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {

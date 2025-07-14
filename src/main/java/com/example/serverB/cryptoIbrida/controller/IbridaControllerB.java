@@ -1,4 +1,4 @@
-package com.example.serverB.cryptoIbrida;
+package com.example.serverB.cryptoIbrida.controller;
 
 import com.example.serverB.cryptoIbrida.dto.IbridResponse;
 import com.example.serverB.cryptoIbrida.service.IbridaServiceB;
@@ -27,9 +27,9 @@ public class IbridaControllerB {
     @Autowired
     private IbridaServiceB ibridaServiceB;
 
-    @RequestMapping(path = "/hand-shake", method = RequestMethod.POST,consumes = MediaType.TEXT_PLAIN_VALUE, produces= MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> scambio(@RequestBody String publicKey) throws IOException {
-        String result=ibridaServiceB.scambio(publicKey);
+    @RequestMapping(path ="/comunicate",method = RequestMethod.POST,consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> comunicate(@RequestBody String message) throws NoSuchPaddingException, IllegalBlockSizeException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
+        String result=ibridaServiceB.comunicate(message);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -38,6 +38,14 @@ public class IbridaControllerB {
         String result=ibridaServiceB.ricevimento(ibridResponse);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+    @RequestMapping(path = "/hand-shake", method = RequestMethod.POST,consumes = MediaType.TEXT_PLAIN_VALUE, produces= MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> scambio(@RequestBody String publicKey) throws IOException {
+        String result=ibridaServiceB.scambio(publicKey);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+
 
 
 }
