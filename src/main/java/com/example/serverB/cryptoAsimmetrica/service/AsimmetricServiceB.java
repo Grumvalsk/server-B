@@ -1,5 +1,6 @@
 package com.example.serverB.cryptoAsimmetrica.service;
 
+import com.example.serverB.cryptoAsimmetrica.dto.AsimmetricResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
@@ -62,7 +63,7 @@ public class AsimmetricServiceB {
         // Scrittura su disco
 
 
-        // Cifratura
+        // Cifratura testo
         byte[] chiavePubA = Base64.getDecoder().decode(chiavePubblicaA);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(chiavePubA);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -75,10 +76,28 @@ public class AsimmetricServiceB {
         byte[] result = cipher.doFinal(testo);
         String messaggioCriptato = Base64.getEncoder().encodeToString(result);
 
+        //Cifratura firma
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] digest = md.digest(message.getBytes(StandardCharsets.UTF_8));
+        String base64Privata = Files.readString(Paths.get("chiave_privata.txt"));
+        byte[] chiavePrivataBytes = Base64.getDecoder().decode(base64Privata);
+
+        // Crea il KeySpec
+        PKCS8EncodedKeySpec keySpecPrivate = new PKCS8EncodedKeySpec(chiavePrivataBytes);
+
+        // Genera la chiave privata
+        KeyFactory keyFactoryPrivate = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactoryPrivate.generatePrivate(keySpecPrivate);
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+        byte[] resultFirma = cipher.doFinal(digest);
+        String firmaCriptata = Base64.getEncoder().encodeToString(resultFirma);
+        AsimmetricResponse asimmetricResponse= new AsimmetricResponse();
+        asimmetricResponse.setFirma(firmaCriptata);
+        asimmetricResponse.setMessaggio(messaggioCriptato);
         // Invio messaggio criptato
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_PLAIN);
-        HttpEntity<String> entity = new HttpEntity<>(messaggioCriptato, headers);
+        HttpEntity<AsimmetricResponse> entity = new HttpEntity<>(asimmetricResponse, headers);
 
         ResponseEntity<String> response = restTemplate.postForEntity(urlComunicate, entity, String.class);
         return response.getBody();
