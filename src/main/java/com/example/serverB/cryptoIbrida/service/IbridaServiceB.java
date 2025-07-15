@@ -1,5 +1,6 @@
 package com.example.serverB.cryptoIbrida.service;
 
+import com.example.serverB.configuration.RestTemplateConfig;
 import com.example.serverB.cryptoIbrida.dto.IbridResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,11 @@ public class IbridaServiceB {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RestTemplateConfig config;
+
+
+
     public String comunicate(String message) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         String chiavePubA= leggiFileDaCartellaEsterna("chiave_pubblicaA.txt").replaceAll("\\r?\\n", "").trim();
         if(chiavePubA==null){
@@ -45,7 +51,7 @@ public class IbridaServiceB {
             HttpEntity<String> request= new HttpEntity<>(chiavePubB);
             HttpEntity<String>response=restTemplate.postForEntity(urlHandShake,request,String.class);
             chiavePubA=response.getBody().replaceAll("\\r?\\n", "").trim();
-            Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
+            Path directory = Paths.get(config.getCartellaChiavi());
             if (!Files.exists(directory)) {
                 Files.createDirectories(directory);
             }
@@ -100,7 +106,7 @@ public class IbridaServiceB {
     }
 
     public String scambio(String chiave) throws IOException {
-        Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
+        Path directory = Paths.get(config.getCartellaChiavi());
         if (!Files.exists(directory)) {
             Files.createDirectories(directory); // crea la cartella se non esiste
         }
@@ -120,7 +126,7 @@ public class IbridaServiceB {
 
     }
     public String leggiFileDaCartellaEsterna( String nomeFile) {
-        Path pathFile = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b", nomeFile);
+        Path pathFile = Paths.get(config.getCartellaChiavi(), nomeFile);
 
         if (!Files.exists(pathFile)) {
             System.out.println("File non trovato: " + pathFile.toAbsolutePath());

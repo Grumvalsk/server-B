@@ -1,5 +1,6 @@
 package com.example.serverB.cryptoAsimmetrica.service;
 
+import com.example.serverB.configuration.RestTemplateConfig;
 import com.example.serverB.cryptoAsimmetrica.dto.AsimmetricResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,9 @@ public class AsimmetricServiceB {
     @Value("${url.asimmetric.handshake}")
     private   String urlComunicate;
 
+    @Autowired
+    private RestTemplateConfig config;
+
     public String comunicate(String message) throws IOException, NoSuchAlgorithmException,
             InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException {
@@ -55,7 +59,7 @@ public class AsimmetricServiceB {
 
             ResponseEntity<String> response = restTemplate.postForEntity(ulrHandShake, httpEntity, String.class);
             chiavePubblicaA = response.getBody().replaceAll("\\r?\\n", "").trim();
-            Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
+            Path directory = Paths.get(config.getCartellaChiavi());
             if (!Files.exists(directory)) {
                 Files.createDirectories(directory);
             }
@@ -146,7 +150,7 @@ public class AsimmetricServiceB {
 
 
     public String scambio(String chiave) throws IOException {
-        Path directory = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b");
+        Path directory = Paths.get(config.getCartellaChiavi());
         if (!Files.exists(directory)) {
             Files.createDirectories(directory); // crea la cartella se non esiste
         }
@@ -190,7 +194,7 @@ public class AsimmetricServiceB {
     }
 
     public String leggiFileDaCartellaEsterna( String nomeFile) {
-        Path pathFile = Paths.get("C:\\Users\\pi03873\\OneDrive - Alliance\\Desktop\\CYBERSECURITY\\serverB\\serverB\\chiavi_pubbliche-b", nomeFile);
+        Path pathFile = Paths.get(config.getCartellaChiavi(), nomeFile);
 
         if (!Files.exists(pathFile)) {
             System.out.println("File non trovato: " + pathFile.toAbsolutePath());
