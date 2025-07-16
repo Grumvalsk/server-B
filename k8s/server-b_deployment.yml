@@ -17,7 +17,7 @@ spec:
           image: server-b:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           volumeMounts:
             - name: chiavi-volume
               mountPath: /app/chiavi_pubbliche-b
