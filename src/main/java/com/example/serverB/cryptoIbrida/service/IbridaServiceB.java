@@ -43,7 +43,7 @@ public class IbridaServiceB {
 
 
     public String comunicate(String message) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        String chiavePubA= leggiFileDaCartellaEsterna("chiave_pubblicaA.txt").replaceAll("\\r?\\n", "").trim();
+        String chiavePubA= leggiFileDaCartellaEsterna("chiave_pubblicaA.txt");
         if(chiavePubA==null){
             String chiavePubB=leggiFileDaResources("chiave_pubblicaB.txt");
             HttpHeaders headers = new HttpHeaders();
@@ -61,6 +61,7 @@ public class IbridaServiceB {
             System.out.println("File scritto in: " + pathFile.toAbsolutePath());
         }
         //gestione chiave pubblica del  server ricevente
+        chiavePubA=chiavePubA.replaceAll("\\r?\\n", "").trim();
         byte[] byteChiavePubA = Base64.getDecoder().decode(chiavePubA);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(byteChiavePubA);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");

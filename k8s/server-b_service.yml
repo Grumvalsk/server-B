@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: server-a
+  name: server-b
 spec:
   selector:
-    app: server-a
+    app: server-b
   ports:
     - protocol: TCP
       port: 8081

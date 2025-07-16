@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: server-b-deployment
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: server-b
@@ -18,3 +18,9 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: chiavi-volume
+              mountPath: /app/chiavi_pubbliche-b
+      volumes:
+        - name: chiavi-volume
+          emptyDir: { }
